@@ -1,0 +1,12 @@
+{
+  "id": "mig_ckke1lsgunftthq6jrq0",
+  "parentID": "mig_ckkdvcbbpod1obsadbjg",
+  "checksum": "1:4dd0b1ba2e1e84a3e4b487868da4dd1d83cb6d1e10552d14cf75ffa451d1db34",
+  "operations": [
+    {
+      "addTable": {
+        "table": "Passwords"
+      }
+    }
+  ]
+}

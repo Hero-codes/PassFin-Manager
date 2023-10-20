@@ -1,0 +1,19 @@
+{
+  "id": "mig_ckke2j4gunftthq6jrt0",
+  "parentID": "mig_ckke22cgunftthq6jrs0",
+  "checksum": "1:cea6740fde7972cf0be310dc0809d827ca7d6e5daaa0431c1634dbc128ce0868",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "owner",
+          "type": "link",
+          "link": {
+            "table": "Users"
+          }
+        },
+        "table": "Expenses"
+      }
+    }
+  ]
+}

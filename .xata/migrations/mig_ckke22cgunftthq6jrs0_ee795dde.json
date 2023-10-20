@@ -1,0 +1,19 @@
+{
+  "id": "mig_ckke22cgunftthq6jrs0",
+  "parentID": "mig_ckke1ukgunftthq6jrr0",
+  "checksum": "1:ee795ddec8a45a7796ae0652afbf17dce5e301353ec8541b271e96dc321eadc9",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "owner",
+          "type": "link",
+          "link": {
+            "table": "Users"
+          }
+        },
+        "table": "Passwords"
+      }
+    }
+  ]
+}

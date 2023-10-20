@@ -1,0 +1,16 @@
+{
+  "id": "mig_ckke2u4gunftthq6jru0",
+  "parentID": "mig_ckke2j4gunftthq6jrt0",
+  "checksum": "1:86c9cbb41ddfc5b93e48de3f9fc769db3ce015efd9f4ca344bdeb2a53158fc3b",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "details",
+          "type": "json"
+        },
+        "table": "Expenses"
+      }
+    }
+  ]
+}

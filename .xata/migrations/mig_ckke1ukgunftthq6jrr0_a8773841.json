@@ -1,0 +1,16 @@
+{
+  "id": "mig_ckke1ukgunftthq6jrr0",
+  "parentID": "mig_ckke1sbbpod1obsadbkg",
+  "checksum": "1:a877384187cb2eea2794c78002926ba9eb2d28db0d7c3525cfce5154281d5a2b",
+  "operations": [
+    {
+      "addColumn": {
+        "column": {
+          "name": "passwordFor",
+          "type": "string"
+        },
+        "table": "Passwords"
+      }
+    }
+  ]
+}
