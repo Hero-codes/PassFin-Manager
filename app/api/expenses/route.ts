@@ -2,8 +2,36 @@ import { NextRequest, NextResponse } from "next/server";
 import { getXataClient } from "@/src/xata";
 import { decodeJwt } from "jose"
 
-//* CREATE EXPENSE
-//* POST ROUTE
+//* @GET EXPENSES OF A SINGLE USER
+//* @GET ROUTE
+
+export async function GET(req: NextRequest) {
+    const xata = getXataClient();
+    const token = req.cookies.get("token")?.value
+
+    if (!token) return NextResponse.json({ message: "User not Authenticated!" }, { status: 401 });
+    const user = decodeJwt(token);
+
+    try {
+        const getUserSpecificExpenses = await xata.db.Expenses.filter({
+            "owner.id": String(user._id)
+        }).getAll();
+
+        return NextResponse.json({
+            getUserSpecificExpenses
+        }, { status: 201 });
+
+    } catch (err) {
+        console.log(err);
+        return NextResponse.json({
+            message: err,
+            success: false
+        }, { status: 401 })
+    };
+}
+
+//* @CREATE EXPENSE
+//* @POST ROUTE
 
 export async function POST(req: NextRequest) {
     const xata = getXataClient();

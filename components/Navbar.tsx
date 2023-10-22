@@ -8,7 +8,7 @@ export default function Navbar() {
         <nav className="container mx-auto">
             <div className="flex items-center gap-5 justify-evenly p-6">
                 <Link href="/" className="flex items-center gap-1">
-                    <h2 className="text-2xl font-bold">MoneyByte</h2>
+                    <h2 className="text-2xl font-bold">PassFin</h2>
                 </Link>
 
                 <div className="md:flex gap-5 text-lg hidden">

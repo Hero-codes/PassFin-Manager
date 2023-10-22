@@ -27,5 +27,10 @@ export async function middleware(request: NextRequest) {
 };
 
 export const config = {
-    matcher: ["/api/expenses", "/api/passwords"]
+    matcher: [
+        "/expenses",
+        "/passwords",
+        "/passwords/:path*",
+        "/expenses/:path*",
+    ]
 };

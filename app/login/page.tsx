@@ -5,26 +5,53 @@ import { Hanko } from "@teamhanko/hanko-frontend-sdk";
 import { FcGoogle, FcKey } from "react-icons/fc"
 import { useEffect, useState } from "react";
 import authImg from "@/public/images/auth.png"
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const hankoApi = process.env.NEXT_PUBLIC_HANKO_API_URL;
 
 export default function Login() {
 
     const [hanko, setHanko] = useState<Hanko>();
+    const [email, setEmail] = useState<string>("");
+    const { push } = useRouter();
+
+    const signInWithGoogle = async () => {
+
+        const hankoMail = new Hanko(hankoApi!);
+        const { email } = await hankoMail.user.getCurrent();
+
+        try {
+            await hanko?.thirdParty.auth("google", "http://localhost:3000/");
+            const { data } = await axios.post("/api/auth/login", {
+                email
+            });
+            push("/");
+            console.log(data);
+
+        } catch (err) {
+            console.log(err);
+        };
+    };
+
+    const signInWithEmail = async () => {
+        try {
+            const { data } = await axios.post("/api/auth/login", {
+                email
+            });
+            push("/");
+            console.log(data);
+
+        } catch (err) {
+            console.log(err);
+        };
+    };
 
     useEffect(() => {
         import("@teamhanko/hanko-frontend-sdk").then(({ Hanko }) => {
             setHanko(new Hanko(hankoApi!));
         });
-    });
-
-    const signInWithGoogle = async () => {
-        try {
-            await hanko?.thirdParty.auth("google", "http://localhost:3000/");
-        } catch (err) {
-            console.log(err);
-        };
-    };
+    }, []);
 
     return (
         <section className="container mx-auto px-3">
@@ -57,11 +84,14 @@ export default function Login() {
 
                 <div className="md:px-7 px-3 py-12 w-full lg:w-1/2 flex flex-col space-y-7">
                     <input
+                        onChange={e => setEmail(e.target.value)}
                         placeholder="Type Your Email..."
                         type="email"
                         className="px-4 py-3 rounded-lg focus:outline-none bg-slate-700/50" />
 
-                    <button className="py-4 rounded-md font-semibold bg-slate-700/30 hover:bg-slate-800/25 active:bg-slate-900">Log In</button>
+                    <button
+                        onClick={signInWithEmail}
+                        className="py-4 rounded-md font-semibold bg-slate-700/30 hover:bg-slate-800/25 active:bg-slate-900">Log In</button>
                     <div className="divider">Or Sign In With</div>
 
                     <div className="flex justify-evenly gap-4">

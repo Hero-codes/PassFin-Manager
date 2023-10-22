@@ -1,6 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getXataClient } from "@/src/xata";
-import { decodeJwt } from "jose"
+import { decodeJwt } from "jose";
+
+//* @GET PASSWORDS OF A SINGLE USER
+//* @GET ROUTE
+
+export async function GET(req: NextRequest) {
+    const xata = getXataClient();
+    const token = req.cookies.get("token")?.value
+
+    if (!token) return NextResponse.json({ message: "User not Authenticated!" }, { status: 401 });
+    const user = decodeJwt(token);
+
+    try {
+        const getUserSpecificPasswords = await xata.db.Passwords.filter({
+            "owner.id": String(user._id)
+        }).getAll();
+
+        return NextResponse.json({
+            getUserSpecificPasswords
+        }, { status: 201 });
+
+    } catch (err) {
+        console.log(err);
+        return NextResponse.json({
+            message: err,
+            success: false
+        }, { status: 401 })
+    };
+}
 
 //* CREATE PASSWORD
 //* POST ROUTE
