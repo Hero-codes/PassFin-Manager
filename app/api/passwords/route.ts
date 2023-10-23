@@ -17,9 +17,9 @@ export async function GET(req: NextRequest) {
             "owner.id": String(user._id)
         }).getAll();
 
-        return NextResponse.json({
-            getUserSpecificPasswords
-        }, { status: 201 });
+        return NextResponse.json(
+            getUserSpecificPasswords,
+            { status: 201 });
 
     } catch (err) {
         console.log(err);

@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import authImg from "@/public/images/auth.png"
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useAuthContext } from "@/context/user";
 
 const hankoApi = process.env.NEXT_PUBLIC_HANKO_API_URL;
 
@@ -15,6 +16,7 @@ export default function Login() {
     const [hanko, setHanko] = useState<Hanko>();
     const [email, setEmail] = useState<string>("");
     const { push } = useRouter();
+    const { setUser, setUserData } = useAuthContext();
 
     const signInWithGoogle = async () => {
 
@@ -26,9 +28,8 @@ export default function Login() {
             const { data } = await axios.post("/api/auth/login", {
                 email
             });
+            setUser(true);
             push("/");
-            console.log(data);
-
         } catch (err) {
             console.log(err);
         };
@@ -39,9 +40,12 @@ export default function Login() {
             const { data } = await axios.post("/api/auth/login", {
                 email
             });
+            setUser(true);
+            setUserData({
+                id: data.registerUser.id,
+                email: data.registerUser.email
+            });
             push("/");
-            console.log(data);
-
         } catch (err) {
             console.log(err);
         };

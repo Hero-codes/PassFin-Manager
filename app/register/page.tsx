@@ -5,18 +5,40 @@ import { Hanko } from "@teamhanko/hanko-frontend-sdk";
 import { FcGoogle, FcKey } from "react-icons/fc"
 import { useEffect, useState } from "react";
 import authImg from "@/public/images/auth.png"
+import axios from "axios";
+import { useAuthContext } from "@/context/user";
+import { useRouter } from "next/navigation";
 
 const hankoApi = process.env.NEXT_PUBLIC_HANKO_API_URL;
 
 export default function Login() {
 
     const [hanko, setHanko] = useState<Hanko>();
+    const [email, setEmail] = useState<string>("");
+    const { push } = useRouter();
+    const { setUser, setUserData } = useAuthContext();
 
     const signInWithGoogle = async () => {
         try {
-            await hanko?.thirdParty.auth("google", "http://localhost:3000/")
+            await hanko?.thirdParty.auth("google", "http://localhost:3000/");
+            setUser(true);
+            push("/");
         } catch (err) {
             console.log(err);
+        };
+    };
+
+    const signInWithEmail = async () => {
+        try {
+            const { data } = await axios.post("/api/auth/register", { email });
+            setUser(true);
+            setUserData({
+                id: data.registerUser.id,
+                email: data.registerUser.email
+            })
+            push("/");
+        } catch (err: any) {
+            console.log(err.response.data);
         };
     };
 
@@ -24,8 +46,7 @@ export default function Login() {
         import("@teamhanko/hanko-frontend-sdk").then(({ Hanko }) => {
             setHanko(new Hanko(hankoApi!));
         });
-    });
-
+    }, []);
 
     return (
         <section className="container mx-auto px-3">
@@ -58,11 +79,14 @@ export default function Login() {
 
                 <div className="md:px-7 px-3 py-12 w-full lg:w-1/2 flex flex-col space-y-7">
                     <input
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
                         placeholder="Type Your Email..."
                         type="email"
                         className="px-4 py-3 rounded-lg focus:outline-none bg-slate-700/50" />
 
                     <button
+                        onClick={signInWithEmail}
                         className="py-4 rounded-md font-semibold bg-slate-700/30 hover:bg-slate-800/25 active:bg-slate-900">Register</button>
                     <div className="divider">Or Register With</div>
 

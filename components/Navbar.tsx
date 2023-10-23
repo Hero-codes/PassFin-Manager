@@ -1,8 +1,12 @@
-import Link from "next/link"
-import { GiHamburgerMenu } from "react-icons/gi"
-import { LogoutBtn } from "./LogOut"
+"use client"
+import Link from "next/link";
+import { GiHamburgerMenu } from "react-icons/gi";
+import { LogoutBtn } from "./LogOut";
+import { useAuthContext } from "@/context/user";
 
 export default function Navbar() {
+
+    const { user } = useAuthContext();
 
     return (
         <nav className="container mx-auto">
@@ -31,21 +35,30 @@ export default function Navbar() {
                                 <h1 className="font-semibold text-lg ml-3">MoneyByte</h1>
                                 <li><Link href="/working">How It Works</Link></li>
                                 <li><Link href="/faqs">FAQS</Link></li>
-                                <Link href={"/register"}>
-                                    <button className="btn btn-outline btn-sm btn-success">Get Started</button>
-                                </Link>
-                                <LogoutBtn />
+
+                                {user ? (
+                                    <LogoutBtn />
+                                ) : (
+                                    <Link href={"/register"}>
+                                        <button className="btn btn-outline btn-sm btn-success">Get Started</button>
+                                    </Link>
+                                )}
+
                             </ul>
                         </div>
                     </div>
                 </div>
 
                 <div className="hidden md:block">
-                    <Link href="/register">
-                        <button className="btn btn-outline btn-sm btn-success">Get Started</button>
-                    </Link>
 
-                    <LogoutBtn />
+                    {user ? (
+                        <LogoutBtn />
+                    ) : (
+                        <Link href="/register">
+                            <button className="btn btn-outline btn-sm btn-success">Get Started</button>
+                        </Link>
+                    )}
+
                 </div>
             </div>
         </nav>

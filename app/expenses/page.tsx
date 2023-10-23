@@ -1,10 +1,77 @@
 "use client"
 import Link from 'next/link'
-import React from 'react'
+import { useEffect, useState } from 'react'
 import img from "@/public/images/safe.png"
 import Image from 'next/image'
+import axios from 'axios'
 
 export default function Expenses() {
+
+    const [expenseInfo, setExpenseInfo] = useState({
+        title: "",
+        amount: 0,
+        description: "",
+    });
+
+    const [expenses, setExpenses] = useState([]);
+    const [selectedType, setSelectedType] = useState("");
+
+    const handleChange = (e: any) => {
+        setExpenseInfo(prev => {
+            return { ...prev, [e.target.name]: e.target.value }
+        });
+    };
+
+    const addExpense = async () => {
+
+        try {
+            const { data } = await axios.post("/api/expenses", {
+                title: expenseInfo.title,
+                amount: expenseInfo.amount,
+                description: expenseInfo.description,
+                expense_type: selectedType
+            });
+
+            setExpenseInfo({
+                title: "",
+                amount: 0,
+                description: "",
+            });
+
+            setExpenses(data);
+            return data;
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const getExpenses = async () => {
+        try {
+            const res = await fetch("/api/expenses", {
+                next: {
+                    revalidate: 3
+                }
+            });
+            const data = await res.json();
+            setExpenses(data);
+            return data;
+        } catch (err) {
+            console.log(err);
+        };
+    };
+
+    const deleteExpense = async (id: string) => {
+        try {
+            const { data } = await axios.delete(`/api/expenses/${id}`)
+        } catch (err) {
+            console.log(err);
+        };
+    };
+
+    useEffect(() => {
+        getExpenses();
+    }, []);
+
     return (
         <div className='mx-auto container px-3'>
             <h2 className='text-3xl font-semibold py-3'>Expenses</h2>
@@ -33,42 +100,63 @@ export default function Expenses() {
             <div className='flex flex-col space-y-6 py-7'>
                 <div className='flex flex-col gap-6'>
                     <input
+                        onChange={handleChange}
+                        value={expenseInfo.title}
+                        name='title'
                         placeholder="Type Your Expense Title..."
                         type="text"
                         className="px-4 py-3 rounded-lg focus:outline-none bg-slate-700/50" />
 
                     <input
+                        onChange={handleChange}
+                        value={expenseInfo.description}
+                        name='description'
                         placeholder="Short Description..."
                         type="text"
                         className="px-4 py-3 rounded-lg focus:outline-none bg-slate-700/50" />
 
                     <input
+                        onChange={handleChange}
+                        value={expenseInfo.amount}
+                        name='amount'
                         placeholder="Amount"
                         type="number"
                         className="px-4 py-3 rounded-lg focus:outline-none bg-slate-700/50" />
 
-                    <select className="select select-bordered w-full max-w-xs">
+                    <select
+                        value={selectedType}
+                        onChange={e => setSelectedType(e.target.value)}
+                        className="select select-bordered w-full max-w-xs">
                         <option disabled selected>Expense Type</option>
-                        <option>Earned</option>
-                        <option>Spent</option>
+                        <option value="Earned">Earned</option>
+                        <option value="Spent">Spent</option>
                     </select>
 
-                    <button className="btn btn-success hover:opacity-80">Add Expense</button>
+                    <button
+                        onClick={addExpense}
+                        className="btn btn-success hover:opacity-80">Add Expense</button>
                 </div>
 
                 <div className='flex flex-wrap gap-6 md:gap-10 justify-center'>
 
-                    <div className="card w-96 bg-base-100 shadow-xl image-full">
-                        <figure><Image src={img} alt="Shoes" /></figure>
-                        <div className="card-body">
-                            <h2 className="card-title">Shoes!</h2>
-                            <p>If a dog chews shoes whose shoes does he choose?</p>
-                            <span>Amount</span>
-                            <div className="card-actions justify-end mt-4">
-                                <button className="btn btn-error">Remove Item</button>
+                    {
+                        expenses.map((expense: any) => (
+
+                            <div className="card w-96 bg-base-100 shadow-xl image-full">
+                                <figure><Image src={img} alt="Shoes" /></figure>
+                                <div className="card-body">
+                                    <h2 className="card-title">{expense.details.title}</h2>
+                                    <p>{expense.details.description}</p>
+                                    <span>{expense.details.amount}</span>
+                                    <div className="card-actions justify-end mt-4">
+                                        <button
+                                            onClick={() => deleteExpense(expense.id)}
+                                            className="btn btn-error">Remove Item</button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                        ))
+                    }
 
                 </div>
             </div>

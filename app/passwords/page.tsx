@@ -1,8 +1,9 @@
 "use client"
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import img from "@/public/images/safe.png"
 import Image from 'next/image'
+import axios from 'axios'
 
 export default function Passwords() {
 
@@ -11,12 +12,64 @@ export default function Passwords() {
         password: "",
         confirmPassword: ""
     });
+    const [passwords, setPasswords] = useState([]);
 
     const handleChange = (e: any) => {
-        setPasswordInfo((prev) => {
+        setPasswordInfo(prev => {
             return { ...prev, [e.target.name]: e.target.value };
         });
     };
+
+    const addPassword = async () => {
+
+        if (passwordInfo.password !== passwordInfo.confirmPassword) {
+            console.log("Wrong Passwords")
+            return; // Toast message saying passwords are inccorect
+        }
+
+        try {
+            const { data } = await axios.post("/api/passwords", {
+                password: passwordInfo.password,
+                passwordFor: passwordInfo.passwordFor
+            });
+
+            setPasswordInfo({
+                password: "",
+                confirmPassword: "",
+                passwordFor: ""
+            });
+            return data;
+        } catch (err) {
+            console.log('There was an error in adding your password')
+        }
+    };
+
+    const getPasswords = async () => {
+        try {
+            const res = await fetch("/api/passwords", {
+                next: {
+                    revalidate: 3
+                }
+            });
+            const data = await res.json();
+            setPasswords(data);
+            return data;
+        } catch (err) {
+            console.log(err);
+        };
+    };
+
+    const deletePassword = async (id: string) => {
+        try {
+            const { data } = await axios.delete(`/api/passwords/${id}`)
+        } catch (err) {
+            console.log(err);
+        };
+    };
+
+    useEffect(() => {
+        getPasswords();
+    }, []);
 
     return (
         <div className='mx-auto container px-3'>
@@ -54,7 +107,7 @@ export default function Passwords() {
                         onChange={handleChange}
                         name='password'
                         placeholder="Type Your Password..."
-                        type="text"
+                        type="password"
                         className="px-4 py-3 rounded-lg focus:outline-none bg-slate-700/50" />
 
                     <input
@@ -62,26 +115,32 @@ export default function Passwords() {
                         onChange={handleChange}
                         name='confirmPassword'
                         placeholder="Confirm Password..."
-                        type="text"
+                        type="password"
                         className="px-4 py-3 rounded-lg focus:outline-none bg-slate-700/50" />
 
                     <button
+                        onClick={addPassword}
                         className="btn btn-success hover:opacity-80">Add Password</button>
                 </div>
 
                 <div className='flex flex-wrap gap-6 md:gap-10 justify-center'>
 
-                    <div className="card w-96 bg-base-100 shadow-xl image-full">
-                        <figure><Image src={img} alt="Shoes" /></figure>
-                        <div className="card-body">
-                            <h2 className="card-title">Shoes!</h2>
-                            <p>If a dog chews shoes whose shoes does he choose?</p>
-                            <span>Amount</span>
-                            <div className="card-actions justify-end mt-4">
-                                <button className="btn btn-error">Remove Password</button>
+                    {passwords.map((password: any) => (
+                        <div key={password.id} className="card w-96 bg-base-100 shadow-xl image-full">
+                            <figure><Image src={img} alt="Shoes" /></figure>
+                            <div className="card-body">
+                                <h2 className="card-title">{password.passwordFor}</h2>
+                                <p className='font-semibold'>Your Passwords Are Safe 🔐</p>
+                                <span>Password: {password.password}</span>
+                                <div className="card-actions justify-end mt-4">
+                                    <button
+                                        onClick={() => deletePassword(password.id)}
+                                        className="btn btn-error">Remove Password</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    ))
+                    }
 
                 </div>
             </div>
