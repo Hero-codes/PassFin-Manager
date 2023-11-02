@@ -1,9 +1,9 @@
 "use client"
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
-import img from "@/public/images/safe.png"
-import Image from 'next/image'
-import axios from 'axios'
+import { addPassword, deletePassword, getPasswords } from '@/helpers/passwordHelper'
+import Image from 'next/image';
+import img from "@/public/images/auth.png"
 
 export default function Passwords() {
 
@@ -20,7 +20,7 @@ export default function Passwords() {
         });
     };
 
-    const addPassword = async () => {
+    const handleAddPassword = async () => {
 
         if (passwordInfo.password !== passwordInfo.confirmPassword) {
             console.log("Wrong Passwords")
@@ -28,47 +28,38 @@ export default function Passwords() {
         }
 
         try {
-            const { data } = await axios.post("/api/passwords", {
-                password: passwordInfo.password,
-                passwordFor: passwordInfo.passwordFor
-            });
-
+            const result = await addPassword(passwordInfo);
+            console.log(result);
             setPasswordInfo({
                 password: "",
                 confirmPassword: "",
                 passwordFor: ""
             });
-            return data;
         } catch (err) {
             console.log('There was an error in adding your password')
         }
     };
 
-    const getPasswords = async () => {
+    const handleDeletePassword = async (id: string) => {
         try {
-            const res = await fetch("/api/passwords", {
-                next: {
-                    revalidate: 3
-                }
-            });
-            const data = await res.json();
-            setPasswords(data);
-            return data;
+            const result = await deletePassword(id);
+            console.log(result);
         } catch (err) {
             console.log(err);
         };
     };
 
-    const deletePassword = async (id: string) => {
+    const handleGetPasswords = async () => {
         try {
-            const { data } = await axios.delete(`/api/passwords/${id}`)
+            const result = await getPasswords();
+            setPasswords(result);
         } catch (err) {
             console.log(err);
         };
     };
 
     useEffect(() => {
-        getPasswords();
+        handleGetPasswords();
     }, []);
 
     return (
@@ -119,29 +110,28 @@ export default function Passwords() {
                         className="px-4 py-3 rounded-lg focus:outline-none bg-slate-700/50" />
 
                     <button
-                        onClick={addPassword}
+                        onClick={handleAddPassword}
                         className="btn btn-success hover:opacity-80">Add Password</button>
                 </div>
 
                 <div className='flex flex-wrap gap-6 md:gap-10 justify-center'>
-
-                    {passwords.map((password: any) => (
-                        <div key={password.id} className="card w-96 bg-base-100 shadow-xl image-full">
-                            <figure><Image src={img} alt="Shoes" /></figure>
-                            <div className="card-body">
-                                <h2 className="card-title">{password.passwordFor}</h2>
-                                <p className='font-semibold'>Your Passwords Are Safe 🔐</p>
-                                <span>Password: {password.password}</span>
-                                <div className="card-actions justify-end mt-4">
-                                    <button
-                                        onClick={() => deletePassword(password.id)}
-                                        className="btn btn-error">Remove Password</button>
+                    {
+                        passwords.map((password: any) => (
+                            <div key={password.id} className="card w-96 bg-base-100 shadow-xl image-full">
+                                <figure><Image src={img} alt="Shoes" /></figure>
+                                <div className="card-body">
+                                    <h2 className="card-title">{password.passwordFor}</h2>
+                                    <p className='font-semibold'>Your Passwords Are Safe 🔐</p>
+                                    <span>Password: {password.password}</span>
+                                    <div className="card-actions justify-end mt-4">
+                                        <button
+                                            onClick={() => handleDeletePassword(password.id)}
+                                            className="btn btn-error">Remove Password</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))
+                        ))
                     }
-
                 </div>
             </div>
         </div>

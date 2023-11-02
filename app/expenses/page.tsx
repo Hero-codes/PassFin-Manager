@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import img from "@/public/images/safe.png"
 import Image from 'next/image'
-import axios from 'axios'
+import { addExpense, getExpense, deleteExpense } from '@/helpers/expenseHelper'
 
 export default function Expenses() {
 
@@ -22,54 +22,40 @@ export default function Expenses() {
         });
     };
 
-    const addExpense = async () => {
-
+    const handleAddExpense = async () => {
         try {
-            const { data } = await axios.post("/api/expenses", {
-                title: expenseInfo.title,
-                amount: expenseInfo.amount,
-                description: expenseInfo.description,
-                expense_type: selectedType
-            });
-
+            const result = await addExpense(expenseInfo)
             setExpenseInfo({
                 title: "",
                 amount: 0,
                 description: "",
             });
-
-            setExpenses(data);
-            return data;
+            console.log(result)
         } catch (err) {
             console.log(err);
         }
     };
 
-    const getExpenses = async () => {
+    const handleGetExpenses = async () => {
         try {
-            const res = await fetch("/api/expenses", {
-                next: {
-                    revalidate: 3
-                }
-            });
-            const data = await res.json();
+            const data = await getExpense();
             setExpenses(data);
-            return data;
         } catch (err) {
             console.log(err);
         };
     };
 
-    const deleteExpense = async (id: string) => {
+    const handleDeleteExpense = async (id: string) => {
         try {
-            const { data } = await axios.delete(`/api/expenses/${id}`)
+            const result = await deleteExpense(id);
+            console.log(result)
         } catch (err) {
             console.log(err);
         };
     };
 
     useEffect(() => {
-        getExpenses();
+        handleGetExpenses();
     }, []);
 
     return (
@@ -133,7 +119,7 @@ export default function Expenses() {
                     </select>
 
                     <button
-                        onClick={addExpense}
+                        onClick={handleAddExpense}
                         className="btn btn-success hover:opacity-80">Add Expense</button>
                 </div>
 
@@ -150,7 +136,7 @@ export default function Expenses() {
                                     <span>{expense.details.amount}</span>
                                     <div className="card-actions justify-end mt-4">
                                         <button
-                                            onClick={() => deleteExpense(expense.id)}
+                                            onClick={() => handleDeleteExpense(expense.id)}
                                             className="btn btn-error">Remove Item</button>
                                     </div>
                                 </div>
